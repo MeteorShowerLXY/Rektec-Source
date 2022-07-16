@@ -60,7 +60,7 @@ namespace Rektec.LXY.DataMigrate.Helper
                 if (serverIndex >= 0 && item.ServerIndex != serverIndex)
                     continue;
 
-                string fullServer = string.Format($"Url={item.Url}/{item.OrgName};Username={item.UserName};Password={item.Password};Domain={item.Domain};AuthType={item.AuthType};");
+                string fullServer = string.Format($"{item.Name}：Url={item.Url}/{item.OrgName};Username={item.UserName};Password={item.Password};Domain={item.Domain};AuthType={item.AuthType};");
 
                 list.Add(new ListItem() { Text = fullServer, Value = item.Id.ToString() });
             }

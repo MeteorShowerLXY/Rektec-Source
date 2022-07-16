@@ -12,6 +12,21 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -49,14 +64,14 @@
       <HintPath>..\packages\Microsoft.CrmSdk.CoreAssemblies.9.0.2.42\lib\net462\Microsoft.Xrm.Sdk.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Xrm.Sdk.Workflow, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.CrmSdk.Workflow.9.0.2.25\lib\net462\Microsoft.Xrm.Sdk.Workflow.dll</HintPath>
+      <HintPath>..\packages\Microsoft.CrmSdk.Workflow.9.0.2.34\lib\net462\Microsoft.Xrm.Sdk.Workflow.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationFramework" />
-    <Reference Include="RekTec.Crm.Common, Version=11.8.0.0, Culture=neutral, PublicKeyToken=5ffbbf739e14015b, processorArchitecture=MSIL">
-      <HintPath>..\packages\RekTec.Crm.Common.11.8.0\lib\net462\RekTec.Crm.Common.dll</HintPath>
+    <Reference Include="RekTec.Crm.Common, Version=11.8.1.0, Culture=neutral, PublicKeyToken=5ffbbf739e14015b, processorArchitecture=MSIL">
+      <HintPath>..\packages\RekTec.Crm.Common.11.8.1\lib\net462\RekTec.Crm.Common.dll</HintPath>
     </Reference>
     <Reference Include="RekTec.Xcrm.Client, Version=1.5.8.0, Culture=neutral, PublicKeyToken=85580feaa5bcac9a, processorArchitecture=MSIL">
       <HintPath>..\packages\RekTec.Xcrm.Client.1.5.8\lib\net45\RekTec.Xcrm.Client.dll</HintPath>
@@ -132,6 +147,7 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Model\FlowDesignModel.cs" />
     <Compile Include="Model\ListItem.cs" />
     <Compile Include="Model\ServerConfigInfo.cs" />
     <Compile Include="Model\ServerInfo.cs" />
@@ -178,6 +194,24 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Config\filterXml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Rektec.LXY.Flow\Rektec.LXY.Flow.csproj">
+      <Project>{70177210-b483-4282-b96f-344f4002e524}</Project>
+      <Name>Rektec.LXY.Flow</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.6.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.6.2 %28x86 和 x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

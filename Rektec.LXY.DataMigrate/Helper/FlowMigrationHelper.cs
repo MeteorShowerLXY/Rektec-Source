@@ -12,7 +12,9 @@
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
+using Newtonsoft.Json;
 using Rektec.LXY.DataMigrate.Model;
+using Rektec.LXY.Flow.Helper;
 using RekTec.Crm.Common.Helper;
 using System;
 using System.Collections.Generic;
@@ -42,14 +44,21 @@ namespace Rektec.LXY.DataMigrate.Helper
         private readonly IOrganizationService OrganizationServiceB;
 
         /// <summary>
+        /// 是否匹配流程【两个环境的流程主键一致则不需要匹配】
+        /// </summary>
+        private bool IsMatchWorkFlow { get; set; }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="serverInfoA">签核流程存在的环境信息</param>
         /// <param name="serverInfoB">需要导入的环境信息</param>
-        public FlowMigrationHelper(ServerInfo serverInfoA, ServerInfo serverInfoB)
+        /// <param name="isMatchWorkFlow">是否匹配流程【两个环境的流程主键一致则不需要匹配】</param>
+        public FlowMigrationHelper(ServerInfo serverInfoA, ServerInfo serverInfoB, bool isMatchWorkFlow)
         {
-            OrganizationServiceA = CommonHelper.GetOrganizationService(serverInfoA);
-            OrganizationServiceB = CommonHelper.GetOrganizationService(serverInfoB);
+            this.OrganizationServiceA = CommonHelper.GetOrganizationService(serverInfoA);
+            this.OrganizationServiceB = CommonHelper.GetOrganizationService(serverInfoB);
+            this.IsMatchWorkFlow = isMatchWorkFlow;
         }
 
         /// <summary>
@@ -114,16 +123,57 @@ namespace Rektec.LXY.DataMigrate.Helper
 
             foreach (Entity entityA in entityListA.Entities)
             {
+                string new_name = entityA.GetAttributeValue<string>("new_name");
+                string new_flowdesign = entityA.GetAttributeValue<string>("new_flowdesign");
+                string new_flowdesign_new = new_flowdesign;
+
+                #region 获取新的签核设计
+                try
+                {
+                    new_flowdesign_new = FlowDesignHelper.GetNewFlowDesign(OrganizationServiceA, OrganizationServiceB, entityA, this.IsMatchWorkFlow, out string msg, out string imortantMsg);
+
+                    this.Log(msg, false);
+                    this.Log(imortantMsg, true);
+                }
+                catch (Exception ex)
+                {
+                    this.Log($"签核流程【{new_name}】获取新的签核设计失败：{ex.Message}", true);
+                    return;
+                }
+                #endregion
+
                 #region 创建新的签核流程
                 Entity entityNewB = CommonHelper.CopyEntity(entityA);
 
-                string new_name = entityA.GetAttributeValue<string>("new_name");
+                #region 匹配相应动作（避免不存在报错）   
+                if (IsMatchWorkFlow)
+                {
+                    string new_presubmitaction = entityA.GetAttributeValue<string>("new_presubmitaction");//提交前动作名称
+                    string new_submitaction = entityA.GetAttributeValue<string>("new_submitaction");//提交后动作名称 
+                    string new_recallaction = entityA.GetAttributeValue<string>("new_recallaction");//撤回动作名称 
+                    string new_approveaction = entityA.GetAttributeValue<string>("new_approveaction");//同意动作名称 
+                    string new_rejectaction = entityA.GetAttributeValue<string>("new_rejectaction");//驳回动作名称  
+                    this.WorkFlowHandle("new_presubmitworkflow_id", new_presubmitaction, entityA, entityNewB, new_name, "提交前动作"); //提交前动作  
+                    this.WorkFlowHandle("new_submitworkflow_id", new_submitaction, entityA, entityNewB, new_name, "提交后动作"); //提交后动作   
+                    this.WorkFlowHandle("new_recallworkflow_id", new_recallaction, entityA, entityNewB, new_name, "撤回动作"); //撤回动作   
+                    this.WorkFlowHandle("new_agreeworkflow_id", new_approveaction, entityA, entityNewB, new_name, "同意动作"); //同意动作   
+                    this.WorkFlowHandle("new_rejectworkflow_id", new_rejectaction, entityA, entityNewB, new_name, "驳回动作"); //驳回动作    
+
+                    this.WorkFlowHandle("new_condition_workflowid", string.Empty, entityA, entityNewB, new_name, "提交前动作"); //操作名称  
+                }
+                #endregion
+
                 Entity selectEntity = entityListB.Entities.FirstOrDefault(x => x.GetAttributeValue<string>("new_name") == new_name);
                 EntityReference new_flow_id = null;//主签核流程
                 if (selectEntity != null)
                     new_flow_id = selectEntity.GetAttributeValue<EntityReference>("new_flow_id");
 
                 entityNewB["new_flow_id"] = new_flow_id;
+                if (new_flowdesign_new != new_flowdesign)
+                {
+                    entityNewB["new_flowdesign"] = new_flowdesign_new;
+                    entityNewB["new_flowdesigndraft"] = new_flowdesign_new;
+                }
                 //流程状态  1 草稿 2 已发布
                 entityNewB["new_flowstatus"] = new OptionSetValue(1);
                 OrganizationServiceB.Create(entityNewB);
@@ -155,7 +205,7 @@ namespace Rektec.LXY.DataMigrate.Helper
                                 }
                                 else if (new_usertype.Value == 9)
                                 {
-                                    this.NotifyUserWorkflowHandle(flownotifyA, flownotifyNewB);
+                                    this.NotifyUserWorkflowHandle(flownotifyA, flownotifyNewB, new_name);
                                 }
                                 else
                                 {
@@ -250,35 +300,94 @@ namespace Rektec.LXY.DataMigrate.Helper
         }
 
         /// <summary>
+        /// 匹配相应的流程
+        /// </summary>
+        /// <param name="field">流程字段</param>
+        /// <param name="uniquename">流程唯一名称</param>
+        /// <param name="entityA"></param>
+        /// <param name="entityNewB"></param>
+        /// <param name="new_flow_name"></param>
+        /// <param name="tip"></param>
+        private void WorkFlowHandle(string field, string uniquename, Entity entityA, Entity entityNewB, string new_flow_name, string tip)
+        {
+            EntityReference new_workflow_id = entityA.GetAttributeValue<EntityReference>(field);//动作
+            if (new_workflow_id != null)
+            {
+                if (!string.IsNullOrEmpty(uniquename))
+                {
+                    uniquename = uniquename.Replace("new_", "");
+                }
+                else
+                {
+                    Entity workflowInfo = OrganizationServiceA.Retrieve(new_workflow_id.LogicalName, new_workflow_id.Id, new ColumnSet("uniquename"));
+                    uniquename = workflowInfo.GetAttributeValue<string>("uniquename");//唯一名称
+                }
+
+                var queryExpression = new QueryExpression(new_workflow_id.LogicalName);
+                queryExpression.ColumnSet.AddColumns("uniquename");
+
+                queryExpression.Criteria.AddCondition("statecode", ConditionOperator.Equal, 1); //激活状态
+                queryExpression.Criteria.AddCondition("parentworkflowid", ConditionOperator.Null); //父流程 ID
+                queryExpression.Criteria.AddCondition("name", ConditionOperator.Equal, new_workflow_id.Name); //流程名称
+                if (!string.IsNullOrEmpty(uniquename))
+                    queryExpression.Criteria.AddCondition("uniquename", ConditionOperator.Equal, uniquename); //唯一名称
+                EntityCollection data = OrganizationServiceB.RetrieveMultiple(queryExpression);
+                if (data.Entities.Count > 0)
+                {
+                    if (data.Entities.Count > 1)
+                        this.Log($"签核流程：【{new_flow_name}】的的{tip}匹配到多个流程{new_workflow_id.Name},已将{tip}设置成{ data.Entities[0].Id}", true);
+
+                    entityNewB[field] = data.Entities[0].ToEntityReference();
+                }
+                else
+                {
+                    entityNewB[field] = null;
+                    this.Log($"导入错误：签核流程【{new_flow_name}】的{tip}【{new_workflow_id.Name}】不存在，需要手动维护", true);
+                }
+            }
+        }
+
+        /// <summary>
         /// 签核知会的自定义用户导入处理
         /// </summary>
         /// <param name="flownotifyA"></param>
         /// <param name="flownotifyNewB"></param>
-        private void NotifyUserWorkflowHandle(Entity flownotifyA, Entity flownotifyNewB)
+        private void NotifyUserWorkflowHandle(Entity flownotifyA, Entity flownotifyNewB, string new_flow_name)
         {
             //自定义用户 
             EntityReference new_notifyuser_workflowid = flownotifyA.GetAttributeValue<EntityReference>("new_notifyuser_workflowid");
             if (new_notifyuser_workflowid != null)
             {
-                Entity notifyUserWorkflowA = OrganizationServiceA.Retrieve(new_notifyuser_workflowid.LogicalName, new_notifyuser_workflowid.Id, new ColumnSet("uniquename"));
-                string uniquename = notifyUserWorkflowA.GetAttributeValue<string>("uniquename");
-                var queryExpression = new QueryExpression(new_notifyuser_workflowid.LogicalName);
-                queryExpression.ColumnSet.AddColumns("uniquename");
-                queryExpression.Criteria.AddCondition("uniquename", ConditionOperator.Equal, uniquename);
-                EntityCollection notifyUserWorkflowListB = OrganizationServiceB.RetrieveMultiple(queryExpression);
-                if (notifyUserWorkflowListB.Entities.Count > 0)
+                if (this.IsMatchWorkFlow)
                 {
-                    flownotifyNewB["new_notifyuser_workflowid"] = notifyUserWorkflowListB.Entities[0].ToEntityReference();
+                    Entity notifyUserWorkflowA = OrganizationServiceA.Retrieve(new_notifyuser_workflowid.LogicalName, new_notifyuser_workflowid.Id, new ColumnSet("uniquename"));
+                    string uniquename = notifyUserWorkflowA.GetAttributeValue<string>("uniquename");
+                    this.WorkFlowHandle("new_notifyuser_workflowid", uniquename, flownotifyA, flownotifyNewB, new_flow_name, "自定义用户");
                 }
                 else
                 {
-                    //动作不存在则赋值null
-                    flownotifyNewB["new_notifyuser_workflowid"] = null;
-
-                    string new_flow_name = flownotifyA.GetAttributeValue<EntityReference>("new_flowid")?.Name;
-
-                    this.Log($"导入错误：签核流程【{new_flow_name}】的自定义用户动作【{new_notifyuser_workflowid.Name}】不存在，需要手动维护", true);
+                    flownotifyNewB["new_notifyuser_workflowid"] = new_notifyuser_workflowid;
                 }
+
+                //var queryExpression = new QueryExpression(new_notifyuser_workflowid.LogicalName);
+                //queryExpression.ColumnSet.AddColumns("uniquename");
+                //queryExpression.Criteria.AddCondition("parentworkflowid", ConditionOperator.Null); //父流程 ID
+                //queryExpression.Criteria.AddCondition("uniquename", ConditionOperator.Equal, uniquename);//唯一名称
+                //EntityCollection notifyUserWorkflowListB = OrganizationServiceB.RetrieveMultiple(queryExpression);
+                //if (notifyUserWorkflowListB.Entities.Count > 0)
+                //{
+                //    if (notifyUserWorkflowListB.Entities.Count > 1)
+                //    {
+                //        this.Log($"签核流程：【{new_flow_name}】的自定义用户动作匹配到多个流程{new_notifyuser_workflowid.Name},已将自定义用户动作设置成{ notifyUserWorkflowListB.Entities[0].Id}", true);
+                //    }
+                //    flownotifyNewB["new_notifyuser_workflowid"] = notifyUserWorkflowListB.Entities[0].ToEntityReference();
+                //}
+                //else
+                //{
+                //    //动作不存在则赋值null
+                //    flownotifyNewB["new_notifyuser_workflowid"] = null;
+                //    this.Log($"导入错误：签核流程【{new_flow_name}】的自定义用户动作【{new_notifyuser_workflowid.Name}】不存在，需要手动维护", true);
+                //}
             }
         }
 
@@ -345,6 +454,9 @@ namespace Rektec.LXY.DataMigrate.Helper
         {
             if (ex == null)
             {
+                if (string.IsNullOrEmpty(msg))
+                    return;
+
                 CommonHelper.WriteLog(msg);
             }
             else

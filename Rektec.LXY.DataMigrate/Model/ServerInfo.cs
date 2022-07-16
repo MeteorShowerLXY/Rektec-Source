@@ -15,6 +15,7 @@ namespace Rektec.LXY.DataMigrate.Model
 {
     public class ServerInfo
     {
+        public string Name { get; set; }
         /// <summary>
         /// 0:ServerA,1:ServerB
         /// </summary>

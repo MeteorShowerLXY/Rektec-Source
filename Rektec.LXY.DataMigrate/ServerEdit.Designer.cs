@@ -49,6 +49,8 @@ namespace Rektec.LXY.DataMigrate
             this.chkIsCheckConfig = new System.Windows.Forms.CheckBox();
             this.label7 = new System.Windows.Forms.Label();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.tbName = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -253,11 +255,34 @@ namespace Rektec.LXY.DataMigrate
             // 
             this.toolTip1.ToolTipTitle = "提示";
             // 
+            // tbName
+            // 
+            this.tbName.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.tbName.Location = new System.Drawing.Point(172, 5);
+            this.tbName.Margin = new System.Windows.Forms.Padding(4);
+            this.tbName.Name = "tbName";
+            this.tbName.Size = new System.Drawing.Size(496, 30);
+            this.tbName.TabIndex = 18;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label8.Location = new System.Drawing.Point(101, 9);
+            this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(69, 20);
+            this.label8.TabIndex = 19;
+            this.label8.Text = "Name：";
+            this.toolTip1.SetToolTip(this.label8, "环境名称");
+            // 
             // ServerEdit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(748, 529);
+            this.Controls.Add(this.tbName);
+            this.Controls.Add(this.label8);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.chkIsCheckConfig);
             this.Controls.Add(this.cbServer);
@@ -308,5 +333,7 @@ namespace Rektec.LXY.DataMigrate
         private System.Windows.Forms.CheckBox chkIsCheckConfig;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.TextBox tbName;
+        private System.Windows.Forms.Label label8;
     }
 }

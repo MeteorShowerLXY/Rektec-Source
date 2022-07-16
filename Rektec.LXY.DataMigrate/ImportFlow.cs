@@ -54,8 +54,16 @@ namespace Rektec.LXY.DataMigrate
             this.cbServerA.SelectedValue = serverConfigInfo.CurrentIdA.ToString();
             this.cbServerB.SelectedValue = serverConfigInfo.CurrentIdB.ToString();
 
-            this.btnEditA.Visible = serverConfigInfo.CurrentIdA > 0;
-            this.btnEditB.Visible = serverConfigInfo.CurrentIdB > 0;
+            this.ButtonShowOrHide();
+        }
+
+        /// <summary>
+        /// 控制按钮的显隐
+        /// </summary>
+        private void ButtonShowOrHide()
+        {
+            this.btnCopyA.Visible = this.btnDeleteA.Visible = this.btnEditA.Visible = this.cbServerA.SelectedIndex > 0;
+            this.btnCopyB.Visible = this.btnDeleteB.Visible = this.btnEditB.Visible = this.cbServerB.SelectedIndex > 0; 
         }
 
         /// <summary>
@@ -92,6 +100,7 @@ namespace Rektec.LXY.DataMigrate
             CommonHelper.SaveFilterXml(filterXml);
 
             this.tbMsg.Text = string.Empty;
+            this.tbImportantMsg.Text = string.Empty;
 
             ServerConfigInfo serverConfigInfo = ServerConfigHelper.GetServerInfoList();
 
@@ -121,7 +130,7 @@ namespace Rektec.LXY.DataMigrate
                 return;
             }
 
-            var flowMigrationHelper = new FlowMigrationHelper(serviceInfoA, serviceInfoB);
+            var flowMigrationHelper = new FlowMigrationHelper(serviceInfoA, serviceInfoB, this.chbIsMatchWorkFlow.Checked);
             flowMigrationHelper.logDelegate += ShowLog;
             flowMigrationHelper.FlowAToB(filterXml, this.chbIsImportDetail.Checked);
         }
@@ -141,10 +150,85 @@ namespace Rektec.LXY.DataMigrate
         }
 
         #region 配置信息相关按钮
+        //删除按钮A
+        private void btnDeleteA_Click(object sender, EventArgs e)
+        {
+            this.DeleteConfig(true);
+        }
+
+        //删除按钮B
+        private void btnDeleteB_Click(object sender, EventArgs e)
+        {
+            this.DeleteConfig(false);
+        }
+
+        /// <summary>
+        /// 删除配置
+        /// </summary>
+        /// <param name="isA"></param>
+        private void DeleteConfig(bool isA)
+        {
+            int id = Convert.ToInt32(isA ? this.cbServerA.SelectedValue : this.cbServerB.SelectedValue);
+            if (id <= 0)
+            {
+                MessageBox.Show("请先选择需要删除的Server");
+                return;
+            }
+            ServerConfigInfo serverConfigInfo = ServerConfigHelper.GetServerInfoList();
+            List<ServerInfo> list = serverConfigInfo.ServerInfos;
+            list.Remove(list.FirstOrDefault(x => x.Id == id));
+            serverConfigInfo.ServerInfos = list;
+
+            if (isA)
+                this.cbServerA.SelectedIndex = 0;
+            else
+                this.cbServerB.SelectedIndex = 0;
+
+            int currentIdA = Convert.ToInt32(this.cbServerA.SelectedValue);
+            int currentIdB = Convert.ToInt32(this.cbServerB.SelectedValue);
+            serverConfigInfo.CurrentIdA = currentIdA;
+            serverConfigInfo.CurrentIdB = currentIdB;
+
+            ServerConfigHelper.SaveServerConfig(serverConfigInfo);
+
+
+            this.ComBoboxBind();
+        }
+
+        //复制按钮A
+        private void btmCopyA_Click(object sender, EventArgs e)
+        {
+            if (this.cbServerA.SelectedIndex <= 0)
+            {
+                MessageBox.Show("请先选择需要编辑的ServerA");
+                return;
+            }
+            int id = Convert.ToInt32(this.cbServerA.SelectedValue);
+            var serverEdit = new ServerEdit(id, true);
+            serverEdit.ShowDialog();
+
+            this.ServerEditAfter(serverEdit);
+        }
+
+        //复制按钮B
+        private void btnCopyB_Click(object sender, EventArgs e)
+        {
+            if (this.cbServerB.SelectedIndex <= 0)
+            {
+                MessageBox.Show("请先选择需要编辑的ServerB");
+                return;
+            }
+            int id = Convert.ToInt32(this.cbServerB.SelectedValue);
+            var serverEdit = new ServerEdit(id, true, true);
+            serverEdit.ShowDialog();
+
+            this.ServerEditAfter(serverEdit);
+        }
+
         //添加按钮A
         private void btnAddA_Click(object sender, EventArgs e)
         {
-            var serverEdit = new ServerEdit(0, true);
+            var serverEdit = new ServerEdit(0, true, true);
             serverEdit.ShowDialog();
 
             this.ServerEditAfter(serverEdit);
@@ -203,7 +287,7 @@ namespace Rektec.LXY.DataMigrate
         //ServerA改变事件
         private void cbServerA_SelectedIndexChanged(object sender, EventArgs e)
         {
-            this.btnEditA.Visible = this.cbServerA.SelectedIndex > 0;
+            this.ButtonShowOrHide();
 
             this.SaveCurrentIndex();
         }
@@ -211,7 +295,7 @@ namespace Rektec.LXY.DataMigrate
         //ServerB改变事件
         private void cbServerB_SelectedIndexChanged(object sender, EventArgs e)
         {
-            this.btnEditB.Visible = this.cbServerB.SelectedIndex > 0;
+            this.ButtonShowOrHide();
 
             this.SaveCurrentIndex();
         }
@@ -225,6 +309,6 @@ namespace Rektec.LXY.DataMigrate
             int currentIdB = Convert.ToInt32(this.cbServerB.SelectedValue);
             ServerConfigHelper.SaveCurrentIndex(currentIdA, currentIdB);
         }
-        #endregion
+        #endregion 
     }
 }

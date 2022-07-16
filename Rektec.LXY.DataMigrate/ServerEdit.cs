@@ -24,13 +24,18 @@ namespace Rektec.LXY.DataMigrate
         /// 是否服务器地址A
         /// </summary>
         private readonly bool IsServerA;
+        /// <summary>
+        /// 是否复制
+        /// </summary>
+        private readonly bool IsCopy;
 
-        public ServerEdit(int id, bool isServerA)
+        public ServerEdit(int id, bool isServerA, bool isCopy = false)
         {
             InitializeComponent();
 
             this.Id = id;
             this.IsServerA = isServerA;
+            this.IsCopy = isCopy;
         }
 
         private void ServerEdit_Load(object sender, EventArgs e)
@@ -75,12 +80,13 @@ namespace Rektec.LXY.DataMigrate
                 ServerConfigInfo serverConfigInfo = ServerConfigHelper.GetServerInfoList();
 
                 ServerInfo serverInfo;
-                if (this.Id <= 0)
+                if (this.Id <= 0 || this.IsCopy)
                 {
                     serverInfo = new ServerInfo()
                     {
+                        Name = this.tbName.Text,
                         Id = serverConfigInfo.ServerInfos.Count + 1,
-                        Url = this.tbUrl.Text.Trim(),
+                        Url = this.tbUrl.Text.Trim().TrimEnd('/'),
                         AuthType = this.cbAuthType.SelectedItem.ToString(),
                         Domain = this.tbDomain.Text.Trim(),
                         OrgName = this.tbOrgName.Text.Trim(),
@@ -93,7 +99,8 @@ namespace Rektec.LXY.DataMigrate
                 else
                 {
                     serverInfo = serverConfigInfo.ServerInfos.FirstOrDefault(x => x.Id == this.Id);
-                    serverInfo.Url = this.tbUrl.Text.Trim();
+                    serverInfo.Name = this.tbName.Text;
+                    serverInfo.Url = this.tbUrl.Text.Trim().TrimEnd('/');
                     serverInfo.AuthType = this.cbAuthType.SelectedItem.ToString();
                     serverInfo.Domain = this.tbDomain.Text.Trim();
                     serverInfo.OrgName = this.tbOrgName.Text.Trim();

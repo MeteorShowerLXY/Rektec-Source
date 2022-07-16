@@ -47,6 +47,11 @@ namespace Rektec.LXY.DataMigrate
             this.tbImportantMsg = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.chbIsMatchWorkFlow = new System.Windows.Forms.CheckBox();
+            this.btnDeleteA = new System.Windows.Forms.Button();
+            this.btnDeleteB = new System.Windows.Forms.Button();
+            this.btnCopyA = new System.Windows.Forms.Button();
+            this.btnCopyB = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lblServerA
@@ -97,10 +102,10 @@ namespace Rektec.LXY.DataMigrate
             // 
             // btnEditA
             // 
-            this.btnEditA.Location = new System.Drawing.Point(1141, 11);
+            this.btnEditA.Location = new System.Drawing.Point(1115, 11);
             this.btnEditA.Margin = new System.Windows.Forms.Padding(4);
             this.btnEditA.Name = "btnEditA";
-            this.btnEditA.Size = new System.Drawing.Size(69, 32);
+            this.btnEditA.Size = new System.Drawing.Size(52, 32);
             this.btnEditA.TabIndex = 5;
             this.btnEditA.Text = "Edit";
             this.btnEditA.UseVisualStyleBackColor = true;
@@ -108,10 +113,10 @@ namespace Rektec.LXY.DataMigrate
             // 
             // btnEditB
             // 
-            this.btnEditB.Location = new System.Drawing.Point(1141, 51);
+            this.btnEditB.Location = new System.Drawing.Point(1115, 51);
             this.btnEditB.Margin = new System.Windows.Forms.Padding(4);
             this.btnEditB.Name = "btnEditB";
-            this.btnEditB.Size = new System.Drawing.Size(69, 31);
+            this.btnEditB.Size = new System.Drawing.Size(52, 31);
             this.btnEditB.TabIndex = 6;
             this.btnEditB.Text = "Edit";
             this.btnEditB.UseVisualStyleBackColor = true;
@@ -127,13 +132,13 @@ namespace Rektec.LXY.DataMigrate
             this.tbMsg.Multiline = true;
             this.tbMsg.Name = "tbMsg";
             this.tbMsg.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.tbMsg.Size = new System.Drawing.Size(1091, 313);
+            this.tbMsg.Size = new System.Drawing.Size(1195, 313);
             this.tbMsg.TabIndex = 8;
             // 
             // btnFlowMigrate
             // 
             this.btnFlowMigrate.Font = new System.Drawing.Font("宋体", 9F);
-            this.btnFlowMigrate.Location = new System.Drawing.Point(265, 332);
+            this.btnFlowMigrate.Location = new System.Drawing.Point(375, 332);
             this.btnFlowMigrate.Margin = new System.Windows.Forms.Padding(4);
             this.btnFlowMigrate.Name = "btnFlowMigrate";
             this.btnFlowMigrate.Size = new System.Drawing.Size(128, 29);
@@ -152,7 +157,7 @@ namespace Rektec.LXY.DataMigrate
             this.tbFilterXml.Multiline = true;
             this.tbFilterXml.Name = "tbFilterXml";
             this.tbFilterXml.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.tbFilterXml.Size = new System.Drawing.Size(1091, 232);
+            this.tbFilterXml.Size = new System.Drawing.Size(1193, 232);
             this.tbFilterXml.TabIndex = 10;
             // 
             // label1
@@ -180,7 +185,7 @@ namespace Rektec.LXY.DataMigrate
             this.btnAddA.Location = new System.Drawing.Point(1061, 11);
             this.btnAddA.Margin = new System.Windows.Forms.Padding(4);
             this.btnAddA.Name = "btnAddA";
-            this.btnAddA.Size = new System.Drawing.Size(69, 32);
+            this.btnAddA.Size = new System.Drawing.Size(46, 32);
             this.btnAddA.TabIndex = 13;
             this.btnAddA.Text = "Add";
             this.btnAddA.UseVisualStyleBackColor = true;
@@ -191,7 +196,7 @@ namespace Rektec.LXY.DataMigrate
             this.btnAddB.Location = new System.Drawing.Point(1061, 51);
             this.btnAddB.Margin = new System.Windows.Forms.Padding(4);
             this.btnAddB.Name = "btnAddB";
-            this.btnAddB.Size = new System.Drawing.Size(69, 31);
+            this.btnAddB.Size = new System.Drawing.Size(46, 31);
             this.btnAddB.TabIndex = 14;
             this.btnAddB.Text = "Add";
             this.btnAddB.UseVisualStyleBackColor = true;
@@ -234,11 +239,72 @@ namespace Rektec.LXY.DataMigrate
             // 
             this.toolTip1.ToolTipTitle = "提示";
             // 
+            // chbIsMatchWorkFlow
+            // 
+            this.chbIsMatchWorkFlow.AutoSize = true;
+            this.chbIsMatchWorkFlow.Font = new System.Drawing.Font("宋体", 9F);
+            this.chbIsMatchWorkFlow.Location = new System.Drawing.Point(249, 338);
+            this.chbIsMatchWorkFlow.Name = "chbIsMatchWorkFlow";
+            this.chbIsMatchWorkFlow.Size = new System.Drawing.Size(119, 19);
+            this.chbIsMatchWorkFlow.TabIndex = 18;
+            this.chbIsMatchWorkFlow.Text = "是否匹配流程";
+            this.toolTip1.SetToolTip(this.chbIsMatchWorkFlow, "【两个环境的流程主键一致则不需要匹配】");
+            this.chbIsMatchWorkFlow.UseVisualStyleBackColor = true;
+            // 
+            // btnDeleteA
+            // 
+            this.btnDeleteA.Location = new System.Drawing.Point(1175, 11);
+            this.btnDeleteA.Margin = new System.Windows.Forms.Padding(4);
+            this.btnDeleteA.Name = "btnDeleteA";
+            this.btnDeleteA.Size = new System.Drawing.Size(69, 32);
+            this.btnDeleteA.TabIndex = 19;
+            this.btnDeleteA.Text = "Delete";
+            this.btnDeleteA.UseVisualStyleBackColor = true;
+            this.btnDeleteA.Click += new System.EventHandler(this.btnDeleteA_Click);
+            // 
+            // btnDeleteB
+            // 
+            this.btnDeleteB.Location = new System.Drawing.Point(1175, 50);
+            this.btnDeleteB.Margin = new System.Windows.Forms.Padding(4);
+            this.btnDeleteB.Name = "btnDeleteB";
+            this.btnDeleteB.Size = new System.Drawing.Size(69, 32);
+            this.btnDeleteB.TabIndex = 20;
+            this.btnDeleteB.Text = "Delete";
+            this.btnDeleteB.UseVisualStyleBackColor = true;
+            this.btnDeleteB.Click += new System.EventHandler(this.btnDeleteB_Click);
+            // 
+            // btnCopyA
+            // 
+            this.btnCopyA.Location = new System.Drawing.Point(1252, 11);
+            this.btnCopyA.Margin = new System.Windows.Forms.Padding(4);
+            this.btnCopyA.Name = "btnCopyA";
+            this.btnCopyA.Size = new System.Drawing.Size(62, 32);
+            this.btnCopyA.TabIndex = 21;
+            this.btnCopyA.Text = "Copy";
+            this.btnCopyA.UseVisualStyleBackColor = true;
+            this.btnCopyA.Click += new System.EventHandler(this.btmCopyA_Click);
+            // 
+            // btnCopyB
+            // 
+            this.btnCopyB.Location = new System.Drawing.Point(1252, 50);
+            this.btnCopyB.Margin = new System.Windows.Forms.Padding(4);
+            this.btnCopyB.Name = "btnCopyB";
+            this.btnCopyB.Size = new System.Drawing.Size(62, 32);
+            this.btnCopyB.TabIndex = 22;
+            this.btnCopyB.Text = "Copy";
+            this.btnCopyB.UseVisualStyleBackColor = true;
+            this.btnCopyB.Click += new System.EventHandler(this.btnCopyB_Click);
+            // 
             // ImportFlow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1273, 845);
+            this.ClientSize = new System.Drawing.Size(1327, 845);
+            this.Controls.Add(this.btnCopyB);
+            this.Controls.Add(this.btnCopyA);
+            this.Controls.Add(this.btnDeleteB);
+            this.Controls.Add(this.btnDeleteA);
+            this.Controls.Add(this.chbIsMatchWorkFlow);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.tbImportantMsg);
             this.Controls.Add(this.chbIsImportDetail);
@@ -284,6 +350,11 @@ namespace Rektec.LXY.DataMigrate
         private System.Windows.Forms.TextBox tbImportantMsg;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.CheckBox chbIsMatchWorkFlow;
+        private System.Windows.Forms.Button btnDeleteA;
+        private System.Windows.Forms.Button btnDeleteB;
+        private System.Windows.Forms.Button btnCopyA;
+        private System.Windows.Forms.Button btnCopyB;
     }
 }
 
