@@ -53,6 +53,7 @@ namespace Rektec.LXY.DataMigrate
                     return;
                 }
 
+                this.tbName.Text = serverInfo.Name;
                 this.tbUrl.Text = serverInfo.Url;
                 this.tbUserName.Text = serverInfo.UserName;
                 this.tbPassword.Text = serverInfo.Password;

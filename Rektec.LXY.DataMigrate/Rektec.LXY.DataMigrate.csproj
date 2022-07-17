@@ -130,6 +130,7 @@
   <ItemGroup>
     <Compile Include="Helper\CommandInfo.cs" />
     <Compile Include="Helper\DbHelperSQL.cs" />
+    <Compile Include="Helper\ImportStandardHelper.cs" />
     <Compile Include="Helper\SqlHelper.cs" />
     <Compile Include="ImportFlow.cs">
       <SubType>Form</SubType>
@@ -141,6 +142,12 @@
     <Compile Include="Helper\FlowMigrationHelper.cs" />
     <Compile Include="Helper\JsonHelper.cs" />
     <Compile Include="Helper\ServerConfigHelper.cs" />
+    <Compile Include="ImportStandard.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImportStandard.Designer.cs">
+      <DependentUpon>ImportStandard.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -161,6 +168,9 @@
     </Compile>
     <EmbeddedResource Include="ImportFlow.resx">
       <DependentUpon>ImportFlow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImportStandard.resx">
+      <DependentUpon>ImportStandard.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

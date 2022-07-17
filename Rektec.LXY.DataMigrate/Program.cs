@@ -16,7 +16,7 @@ namespace Rektec.LXY.DataMigrate
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ImportFlow());
+            Application.Run(new MainForm());
         }
     }
 }

@@ -68,6 +68,7 @@ namespace Rektec.LXY.DataMigrate.Helper
         /// <param name="isImportDetail">是否导入明细</param>
         public void FlowAToB(string filterXml, bool isImportDetail = false)
         {
+            this.Log("导入签核流程开始", false);
             try
             {
                 this.FlowAToBHandle(filterXml, isImportDetail);

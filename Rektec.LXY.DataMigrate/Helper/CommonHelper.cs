@@ -63,7 +63,10 @@ namespace Rektec.LXY.DataMigrate.Helper
             createEntity[entity.LogicalName + "id"] = createEntity.Id;
             foreach (var attribute in entity.Attributes)
             {
-                if (attribute.Key == entity.LogicalName + "id" || attribute.Key == "createdon" || attribute.Key == "modifiedon")
+                if (attribute.Key == entity.LogicalName + "id"
+                    || attribute.Key == "createdon" || attribute.Key == "modifiedon"
+                    || attribute.Key == "createdby" || attribute.Key == "modifiedby"
+                    || attribute.Key == "ownerid" || attribute.Key == "owningbusinessunit" || attribute.Key == "owninguser")
                     continue;
 
                 createEntity[attribute.Key] = attribute.Value;
@@ -157,6 +160,59 @@ namespace Rektec.LXY.DataMigrate.Helper
     <condition attribute='new_flowstatus' operator='eq' value='2' /> 
     <condition attribute='new_name' operator='in' >
       <value>替换成实际的签核流程名称</value>
+    </condition>
+</filter>";
+
+            return filterXml;
+        }
+
+
+        /// <summary>
+        /// 保存过滤条件
+        /// </summary>
+        /// <param name="content"></param>
+        public static void SaveStandardFilterXml(string content)
+        {
+            try
+            {
+                string path = Environment.CurrentDirectory + "\\Config\\";
+                //判断该路径下的文件夹是否存在，不存在则创建
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+
+                string fullPath = path + "StandardFilterXml.txt";
+                File.WriteAllText(fullPath, content);
+            }
+            catch
+            {
+
+            }
+        }
+
+        /// <summary>
+        /// 获取过滤条件
+        /// </summary>
+        /// <param name="content"></param>
+        public static string GetStandardFilterXml()
+        {
+            try
+            {
+                string path = Environment.CurrentDirectory + "\\Config\\";
+                string fullPath = path + "StandardFilterXml.txt";
+                return File.ReadAllText(fullPath);
+            }
+            catch
+            {
+
+            }
+
+            string filterXml = $@"
+<filter type='and'>
+    <condition attribute='statecode' operator='eq' value='0' /> 
+    <condition attribute='modifiedon' operator='ge' value='{DateTime.Now.AddMonths(-3).Date}' /> 
+    <condition attribute='modifiedon' operator='lt' value='{DateTime.Now.Date}' /> 
+    <condition attribute='new_name' operator='in' >
+      <value>替换成实际的名称</value>
     </condition>
 </filter>";
 

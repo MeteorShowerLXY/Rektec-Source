@@ -16,5 +16,17 @@ namespace Rektec.LXY.DataMigrate
         {
             InitializeComponent();
         }
+
+        private void btnFlow_Click(object sender, EventArgs e)
+        {
+            ImportFlow importFlow = new ImportFlow();
+            importFlow.ShowDialog();
+        }
+
+        private void btnStandard_Click(object sender, EventArgs e)
+        {
+            ImportStandard importStandard = new ImportStandard();
+            importStandard.ShowDialog();
+        }
     }
 }

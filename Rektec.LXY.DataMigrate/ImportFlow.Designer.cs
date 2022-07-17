@@ -324,7 +324,7 @@ namespace Rektec.LXY.DataMigrate
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "ImportFlow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "ImportFlow";
+            this.Text = "迁移签核流程";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

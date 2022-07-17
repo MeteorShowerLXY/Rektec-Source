@@ -63,7 +63,7 @@ namespace Rektec.LXY.DataMigrate
         private void ButtonShowOrHide()
         {
             this.btnCopyA.Visible = this.btnDeleteA.Visible = this.btnEditA.Visible = this.cbServerA.SelectedIndex > 0;
-            this.btnCopyB.Visible = this.btnDeleteB.Visible = this.btnEditB.Visible = this.cbServerB.SelectedIndex > 0; 
+            this.btnCopyB.Visible = this.btnDeleteB.Visible = this.btnEditB.Visible = this.cbServerB.SelectedIndex > 0;
         }
 
         /// <summary>
@@ -177,6 +177,19 @@ namespace Rektec.LXY.DataMigrate
             ServerConfigInfo serverConfigInfo = ServerConfigHelper.GetServerInfoList();
             List<ServerInfo> list = serverConfigInfo.ServerInfos;
             list.Remove(list.FirstOrDefault(x => x.Id == id));
+            list = list.OrderBy(x => x.Id).ToList();
+
+            int currentIdA = Convert.ToInt32(this.cbServerA.SelectedValue);
+            int currentIdB = Convert.ToInt32(this.cbServerB.SelectedValue);
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i].Id == currentIdA)
+                    currentIdA = i + 1;
+                if (list[i].Id == currentIdB)
+                    currentIdB = i + 1;
+                list[i].Id = i + 1;
+            }
             serverConfigInfo.ServerInfos = list;
 
             if (isA)
@@ -184,8 +197,7 @@ namespace Rektec.LXY.DataMigrate
             else
                 this.cbServerB.SelectedIndex = 0;
 
-            int currentIdA = Convert.ToInt32(this.cbServerA.SelectedValue);
-            int currentIdB = Convert.ToInt32(this.cbServerB.SelectedValue);
+
             serverConfigInfo.CurrentIdA = currentIdA;
             serverConfigInfo.CurrentIdB = currentIdB;
 
